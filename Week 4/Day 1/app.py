@@ -39,15 +39,28 @@ HF_TOKEN = os.environ["HF_TOKEN"]
 """
 ### 1. CREATE TEXT LOADER AND LOAD DOCUMENTS
 ### NOTE: PAY ATTENTION TO THE PATH THEY ARE IN. 
-text_loader = 
-documents = 
+text_loader = TextLoader('./data/paul_graham_essays.txt')
+documents = text_loader.load()
 
 ### 2. CREATE TEXT SPLITTER AND SPLIT DOCUMENTS
-text_splitter = 
-split_documents = 
+def embed_length(text):
+    tokens = HuggingFaceEndpoint(
+        endpoint_url=HF_EMBED_ENDPOINT,
+        huggingfacehub_api_token=HF_TOKEN
+    )
+
+    return len(tokens)
+
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=200,
+    chunk_overlap=0,
+    length_function=embed_length
+)
+
+split_documents = text_splitter.split_documents
 
 ### 3. LOAD HUGGINGFACE EMBEDDINGS
-hf_embeddings = 
+hf_embeddings = 1
 
 if os.path.exists("./data/vectorstore"):
     vectorstore = FAISS.load_local(
@@ -71,17 +84,17 @@ hf_retriever = vectorstore.as_retriever()
 2. Create a Prompt Template from the String Template
 """
 ### 1. DEFINE STRING TEMPLATE
-RAG_PROMPT_TEMPLATE = 
+RAG_PROMPT_TEMPLATE = 1
 
 ### 2. CREATE PROMPT TEMPLATE
-rag_prompt =
+rag_prompt = 1
 
 # -- GENERATION -- #
 """
 1. Create a HuggingFaceEndpoint for the LLM
 """
 ### 1. CREATE HUGGINGFACE ENDPOINT FOR LLM
-hf_llm = 
+hf_llm = 1
 
 @cl.author_rename
 def rename(original_author: str):
@@ -106,7 +119,7 @@ async def start_chat():
     """
 
     ### BUILD LCEL RAG CHAIN THAT ONLY RETURNS TEXT
-    lcel_rag_chain = 
+    lcel_rag_chain = 1
 
     cl.user_session.set("lcel_rag_chain", lcel_rag_chain)
 
