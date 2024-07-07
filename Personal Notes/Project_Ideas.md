@@ -30,5 +30,14 @@ An agent that can write code to generate other agents based on the user request.
         - Stream the text response (maybe do TTS too)
         - Store questions and answers in a DB
 
+## Image to 3D model (GPT3D) 
+- Use a depth mapping model and gpt-4o to generate a point cloud that can be converted to a 3D model and 3D printed.
+     - https://medium.com/yodayoda/from-depth-map-to-point-cloud-7473721d3f
+- Load into solidworks and run featureworks on it
+
+
+## API Assistant
+- The LLM will search the internet for API documentation for a given 
+
 ### Links
 1. https://docs.chainlit.io/advanced-features/multi-modal (multimodal chainlit integration)
