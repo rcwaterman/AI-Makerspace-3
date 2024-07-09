@@ -124,7 +124,7 @@ async def main(message: cl.Message):
             if key == 'context':
                 continue
             else:
-                #This is also to prevent an "Object of type Document is not JSON serializable" error
+                #This is also to prevent an "Object of type 'AIMessageChunk' is not JSON serializable" error
                 data = chunk.get(key)
                 await msg.stream_token(data.content)
 
