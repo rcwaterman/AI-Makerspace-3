@@ -2,16 +2,13 @@ import os
 import chainlit as cl
 from dotenv import load_dotenv
 from operator import itemgetter
-from langchain_huggingface import HuggingFaceEndpoint
-from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Qdrant
+from langchain_core.runnables import RunnablePassthrough
 from langchain.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
 from langchain.schema.runnable.config import RunnableConfig
 
 # GLOBAL SCOPE - ENTIRE APPLICATION HAS ACCESS TO VALUES SET IN THIS SCOPE #
@@ -35,7 +32,7 @@ loader = PyPDFLoader("data/Airbnb_10k.pdf", extract_images=True)
 pages = loader.load()
 
 text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size = 200,
+    chunk_size = 250,
     chunk_overlap = 50
 )
 
@@ -48,8 +45,9 @@ embeddings = OpenAIEmbeddings(
 qdrant_vector_store = Qdrant.from_documents(
     documents,
     embeddings,
+    metadata_payload_key="payload",
     location=":memory:",
-    collection_name="Airbnb_10k",
+    collection_name="Airbnb_10k"
 )
 
 retriever = qdrant_vector_store.as_retriever()
@@ -66,16 +64,16 @@ Question:
 prompt = ChatPromptTemplate.from_template(template)
 
 primary_qa_llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
-
+          
 @cl.author_rename
 def rename(original_author: str):
     """
     This function can be used to rename the 'author' of a message. 
 
-    In this case, we're overriding the 'Assistant' author to be 'Paul Graham Essay Bot'.
+    In this case, we're overriding the 'Assistant' author to be 'Airbnb 10-k Bot'.
     """
     rename_dict = {
-        "Assistant" : "Paul Graham Essay Bot"
+        "Assistant" : "Airbnb 10-k Bot"
     }
     return rename_dict.get(original_author, original_author)
 
@@ -119,9 +117,15 @@ async def main(message: cl.Message):
     msg = cl.Message(content="")
 
     async for chunk in retrieval_augmented_qa_chain.astream(
-        {"query": message.content},
+        {"question": message.content},
         config=RunnableConfig(callbacks=[cl.LangchainCallbackHandler()]),
     ):
-        await msg.stream_token(chunk)
+        for key in chunk: #ignore this because it throws an 'Object of type Document is not JSON serializable' error
+            if key == 'context':
+                continue
+            else:
+                #This is also to prevent an "Object of type Document is not JSON serializable" error
+                data = chunk.get(key)
+                await msg.stream_token(data.content)
 
     await msg.send()
