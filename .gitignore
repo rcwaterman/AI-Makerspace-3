@@ -4,3 +4,5 @@ __pycache__/
 venv
 llama38binstruct_summarize
 *.Identifier
+index.pkl
+index.faiss
