@@ -1,0 +1,3 @@
+[submodule "SimpliFinance"]
+	path = SimpliFinance
+	url = git@hf.co:spaces/rcwaterman/SimpliFinance
